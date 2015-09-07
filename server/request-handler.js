@@ -11,8 +11,9 @@ this file and include it in basic-server.js so that it actually works.
 *Hint* Check out the node module documentation at http://nodejs.org/api/modules.html.
 
 **************************************************************/
+var messages = require("./messages.js");
 
-var requestHandler = function(request, response) {
+module.exports = function(request, response) {
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -30,7 +31,7 @@ var requestHandler = function(request, response) {
   console.log("Serving request type " + request.method + " for url " + request.url);
 
   // The outgoing status.
-  var statusCode = 200;
+  var statusCode = 400;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -39,11 +40,32 @@ var requestHandler = function(request, response) {
   //
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
+
+  //TODO change header type based on what we are returning
   headers['Content-Type'] = "text/plain";
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-  response.writeHead(statusCode, headers);
+
+  if (request.method === "GET" && request.url === "/classes/messages" ) {
+    headers['Content-Type'] = "application/json"
+    statusCode = 200;
+  }
+  else if (request.method === "POST" && request.url === "/classes/messages" ) {
+    var msg = "";
+    request.on('data', function(data) {
+      msg += data;  
+    });
+    request.on('end', function() {
+      messages.addMessage(JSON.parse(msg));
+    });
+    headers['Content-Type'] = "application/json"
+    statusCode = 201;
+  } 
+  else {
+    statusCode = 404;
+  }
+  
 
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
@@ -52,6 +74,8 @@ var requestHandler = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
+    response.writeHead(statusCode, headers);
+
   response.end("Hello, World!");
 };
 
