@@ -28,7 +28,7 @@ module.exports.requestHandler = function(request, response) {
   // Adding more logging to your server can be an easy way to get passive
   // debugging help, but you should always be careful about leaving stray
   // console.logs in your code.
-  console.log("Serving request type " + request.method + " for url " + request.url);
+  // console.log("Serving request type " + request.method + " for url " + request.url);
 
   // The outgoing status.
   var statusCode = 400;
@@ -47,14 +47,14 @@ module.exports.requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   var path = url.parse(request.url).pathname;
-  console.log("URL Pathname: " + path +", method: " + request.method);
+  // console.log("URL Pathname: " + path +", method: " + request.method); 
   if (request.method === "OPTIONS"){
     statusCode = 200;
     headers['Allow'] = "POST,GET,PUT,OPTIONS";
     response.writeHead(statusCode, headers);
     response.end();
   }
-  else if (request.method === "GET" && path === "/classes/messages" ) {
+  else if (request.method === "GET" && path === "/classes/messages" ) { 
     headers['Content-Type'] = "application/json"
     statusCode = 200;
 
@@ -76,10 +76,18 @@ module.exports.requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end("Hello, World!");
   } 
+  else if (request.method === "GET" && path === "/" ) {
+    statusCode = 301;
+    response.writeHead(statusCode, headers);
+
+    response.end("Hello, Sir!");
+  }
   else {
     statusCode = 404;
 
     response.writeHead(statusCode, headers);
+    // console.log("URL Pathname: " + path +", method: " + request.method);
+
     response.end("Hello, World!");
   }
   
