@@ -12,8 +12,8 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 var messages = require("./messages.js");
-
-module.exports = function(request, response) {
+var url = require('url');
+module.exports.requestHandler = function(request, response) {
   // Request and Response come from node's http module.
   //
   // They include information about both the incoming request, such as
@@ -46,12 +46,25 @@ module.exports = function(request, response) {
 
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
-
-  if (request.method === "GET" && request.url === "/classes/messages" ) {
+  var path = url.parse(request.url).pathname;
+  console.log("URL Pathname: " + path +", method: " + request.method);
+  if (request.method === "OPTIONS"){
+    statusCode = 200;
+    headers['Allow'] = "POST,GET,PUT,OPTIONS";
+    response.writeHead(statusCode, headers);
+    response.end();
+  }
+  else if (request.method === "GET" && path === "/classes/messages" ) {
     headers['Content-Type'] = "application/json"
     statusCode = 200;
+
+    response.writeHead(statusCode, headers);
+    response.end(messages.getMessages());
   }
-  else if (request.method === "POST" && request.url === "/classes/messages" ) {
+  else if (request.method === "POST" && path === "/classes/messages" ) {
+    headers['Content-Type'] = "application/json"
+    statusCode = 201;
+  
     var msg = "";
     request.on('data', function(data) {
       msg += data;  
@@ -59,11 +72,15 @@ module.exports = function(request, response) {
     request.on('end', function() {
       messages.addMessage(JSON.parse(msg));
     });
-    headers['Content-Type'] = "application/json"
-    statusCode = 201;
+  
+    response.writeHead(statusCode, headers);
+    response.end("Hello, World!");
   } 
   else {
     statusCode = 404;
+
+    response.writeHead(statusCode, headers);
+    response.end("Hello, World!");
   }
   
 
@@ -74,9 +91,6 @@ module.exports = function(request, response) {
   //
   // Calling .end "flushes" the response's internal buffer, forcing
   // node to actually send all the data over to the client.
-    response.writeHead(statusCode, headers);
-
-  response.end("Hello, World!");
 };
 
 // These headers will allow Cross-Origin Resource Sharing (CORS).

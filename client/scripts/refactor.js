@@ -21,7 +21,7 @@
 /////////////////////////////////////////////////////////////////////////////
 
 var Message = Backbone.Model.extend({
-  url: 'http://127.0.0.1:3000/',
+  url: 'http://127.0.0.1:3000/classes/messages',
   defaults: {
     username: '',
     text: ''
@@ -34,7 +34,8 @@ var Messages = Backbone.Collection.extend({
   url: 'http://127.0.0.1:3000/classes/messages',
 
   loadMsgs: function() {
-    this.fetch({data: { order: '-createdAt' }});
+    // this.fetch({data: { order: '-createdAt' }});
+    this.fetch();
   },
 
   parse: function(response, options) {
@@ -104,7 +105,7 @@ var MessagesView = Backbone.View.extend({
 
   initialize: function() {
     this.collection.on('sync', this.render, this);
-    this.onscreenMessages = {};
+    // this.onscreenMessages = {};
   },
 
   render: function() {
@@ -112,11 +113,11 @@ var MessagesView = Backbone.View.extend({
   },
 
   renderMessage: function(message) {
-    if (!this.onscreenMessages[message.get('objectId')]) {
+    // if (!this.onscreenMessages[message.get('objectId')]) {
       var messageView = new MessageView({model: message});
       this.$el.prepend(messageView.render());
-      this.onscreenMessages[message.get('objectId')] = true;
-    }
+      // this.onscreenMessages[message.get('objectId')] = true;
+    // }
   }
 
 });
@@ -128,7 +129,7 @@ var MessagesView = Backbone.View.extend({
 
 app = {
 
-    server: 'https://api.parse.com/1/classes/chatterbox/',
+    server: 'http://127.0.0.1:3000/classes/messages',
 
     init: function() {
       // Get username

@@ -1,14 +1,15 @@
 // message handler
-var messages = [];
-
+var messages = {results: []};
+var id = 0;
 var addMessage = function(message) {
   // console.log("Adding: " + message.username + message.message);
-  messages.push(message);
+  message["objectId"]= id++;
+  messages.results.unshift( message );
 };
 
-var retrieveMessages = function(message) {
-  return messages;  
+var getMessages = function(message) {
+  return JSON.stringify(messages);  
 }
 
 module.exports.addMessage = addMessage;
-module.exports.retrieveMessages = retrieveMessages;
+module.exports.getMessages = getMessages;
