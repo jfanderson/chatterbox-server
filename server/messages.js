@@ -1,30 +1,34 @@
 var fs = require('fs');
 
-// fs.open('./messageLog.txt', 'r+');
-
-
-
 // message handler
 var messages = {results: []};
 var id = 0;
 var addMessage = function(message) {
-  // console.log("Adding: " + message.username + message.message);
-  message["objectId"]= id++;
+  message["objectId"]= createObjectId(message);
+
   fs.appendFile('./messageLog.txt', '\n' + JSON.stringify(message));
   messages.results.unshift( message );
 };
 
 var getMessages = function(message) {
-  var msg = "";
-  fs.readFile('./messageLog.txt', 'utf8', function (err, data) { 
-    if (err) throw err;
-    msg = data
-    messages.results = data.split('\n')
+  var data = fs.readFileSync('./messageLog.txt', 'utf8');
+
+  messages.results = data.split('\n').map(function(item) {
+    if (item)
+      return JSON.parse(item);
   });
   // messages.results = msg.split('\n');
   // console.log("Test: " + JSON.stringify(messages));
+  // debugger;
   return JSON.stringify(messages);  
+  // var x = JSON.stringify(messages);
+  // debugger;
 }
+var createObjectId = function (obj) {
 
+  return Date.now() % 100000;
+}
 module.exports.addMessage = addMessage;
 module.exports.getMessages = getMessages;
+
+// getMessages();
